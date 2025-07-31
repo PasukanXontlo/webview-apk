@@ -24,14 +24,13 @@ jobs:
 
       - name: Init TWA project
         run: |
-          yes | npx bubblewrap init \
+          npx bubblewrap init \
             --manifest=https://data-keuangan-aziva.web.app/manifest.json \
             --directory=twa-project \
             --force \
             --usePlaySigning=false \
-            --skipPrompt
-            --packageId=com.azivastore.app
-            
+            --skipPrompt \
+            --packageId=com.aziva.keuangan
 
       - name: Build APK
         working-directory: twa-project
