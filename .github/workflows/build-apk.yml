@@ -30,6 +30,7 @@ jobs:
             --force \
             --usePlaySigning=false \
             --skipPrompt \
+            --skipJdkDownload=true \
             --packageId=com.aziva.keuangan
 
       - name: Build APK
