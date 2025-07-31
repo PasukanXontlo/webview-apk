@@ -28,7 +28,8 @@ jobs:
             --manifest=https://data-keuangan-aziva.web.app/manifest.json \
             --directory=twa-project \
             --force \
-            --usePlaySigning=false
+            --usePlaySigning=false \
+            --skipPrompt
 
       - name: Build APK
         working-directory: twa-project
