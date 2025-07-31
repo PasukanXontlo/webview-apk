@@ -30,6 +30,8 @@ jobs:
             --force \
             --usePlaySigning=false \
             --skipPrompt
+            --packageId=com.azivastore.app
+            
 
       - name: Build APK
         working-directory: twa-project
