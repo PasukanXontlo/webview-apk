@@ -13,23 +13,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
-
-      - name: Setup Java 17 (required by Bubblewrap)
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: 17
 
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
       - name: Init TWA project
         run: |
-          npx bubblewrap init \
+          yes "n" | npx bubblewrap init \
             --manifest=https://data-keuangan-aziva.web.app/manifest.json \
             --directory=twa-project \
             --force \
