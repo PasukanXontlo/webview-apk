@@ -1,46 +1,40 @@
+cbk tulis lengkap perbaiki 
+
+
 name: Build TWA APK
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      # Setup Java (untuk Bubblewrap)
-      - name: Setup Java 17
+      # Menginstal Java Development Kit (JDK)
+      - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: "temurin"
           java-version: "17"
-          # Hapus cache gradle karena tidak digunakan
-          cache: "none"
 
-      # Setup Node.js (untuk Bubblewrap)
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      # Menginstal Android SDK (termasuk build-tools)
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
         with:
-          node-version: "18"
-          cache: "npm"
-
-      # Install Bubblewrap
+          sdk-version: 34.0.0
+          
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
-      # Inisialisasi project TWA
-      - name: Initialize TWA Project
+      - name: Install Bubblewrap & Initialize TWA
         run: |
-          # Skip instalasi JDK dan Android SDK karena sudah disetup oleh GitHub Actions
-          export BUBBLEWRAP_DISABLE_SDK_INSTALLATION=true
-          yes | bubblewrap init \
+          yes | npx bubblewrap init \
             --manifest=https://data-keuangan-aziva.web.app/manifest.json \
             --directory=twa-project \
             --force \
@@ -48,22 +42,16 @@ jobs:
             --skipPrompt \
             --packageId=com.aziva.keuangan
 
-      # Build APK
       - name: Build APK
         working-directory: twa-project
-        run: |
-          # Set environment variables untuk build Android
-          export ANDROID_HOME=$ANDROID_SDK_ROOT
-          export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
-          
-          bubblewrap build \
-            --skipVersionCheck \
-            --skipPwaValidation
+        run: bubblewrap build
 
-      # Upload hasil APK
-      - name: Upload APK Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: twa-apk
           path: twa-project/app-release-signed.apk
-          retention-days: 7
+          
+          
+          
+          
