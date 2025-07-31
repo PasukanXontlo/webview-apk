@@ -13,12 +13,22 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      # Menginstal Java Development Kit (JDK)
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: "temurin"
           java-version: "17"
 
+      # Menginstal Android SDK (termasuk build-tools)
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          # Versi SDK yang diperlukan.
+          # Sesuaikan jika Anda menemukan error build tool spesifik.
+          # Versi 34.0.0 adalah versi terbaru yang umum digunakan.
+          sdk-version: 34.0.0
+          
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
