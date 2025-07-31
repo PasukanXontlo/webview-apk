@@ -18,6 +18,12 @@ jobs:
         with:
           node-version: 18
 
+      - name: Setup Java 17 (required by Bubblewrap)
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
