@@ -31,7 +31,7 @@ jobs:
 
       - name: Init TWA project
         run: |
-          echo "n" | npx bubblewrap init \
+          echo "y" | npx bubblewrap init \
             --manifest=https://data-keuangan-aziva.web.app/manifest.json \
             --directory=twa-project \
             --force \
