@@ -1,4 +1,4 @@
-name: Build WebView APK
+name: Build TWA APK
 
 on:
   push:
@@ -10,26 +10,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 18
 
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
       - name: Init TWA project
         run: |
-          bubblewrap init --manifest=https://data-keuangan-aziva.web.app/manifest.json --directory=twa-project --force
-          cd twa-project
-          bubblewrap build
+          npx bubblewrap init \
+            --manifest=https://data-keuangan-aziva.web.app/manifest.json \
+            --directory=twa-project \
+            --force \
+            --usePlaySigning=false
 
-      - name: Upload APK to GitHub Releases
-        uses: ncipollo/release-action@v1
+      - name: Build APK
+        run: |
+          cd twa-project
+          npx bubblewrap build
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
         with:
-          tag: latest
-          name: WebView APK
-          files: twa-project/*.apk
+          name: aziva-release-apk
+          path: twa-project/app-release.apk
