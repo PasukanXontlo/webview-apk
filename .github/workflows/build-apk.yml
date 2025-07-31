@@ -24,9 +24,6 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
-          # Versi SDK yang diperlukan.
-          # Sesuaikan jika Anda menemukan error build tool spesifik.
-          # Versi 34.0.0 adalah versi terbaru yang umum digunakan.
           sdk-version: 34.0.0
           
       - name: Install Bubblewrap
@@ -34,13 +31,12 @@ jobs:
 
       - name: Init TWA project
         run: |
-          npx bubblewrap init \
+          echo "n" | npx bubblewrap init \
             --manifest=https://data-keuangan-aziva.web.app/manifest.json \
             --directory=twa-project \
             --force \
             --usePlaySigning=false \
             --skipPrompt \
-            --skipJdkDownload=true \
             --packageId=com.aziva.keuangan
 
       - name: Build APK
