@@ -4,44 +4,27 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:  # Memungkinkan trigger manual dari UI GitHub
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30  # Batas waktu eksekusi
+    timeout-minutes: 30
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Mengambil seluruh history git
 
-      # Setup Java JDK
+      # Setup Java (untuk Bubblewrap)
       - name: Setup Java 17
         uses: actions/setup-java@v3
         with:
           distribution: "temurin"
           java-version: "17"
-          cache: "gradle"  # Mengaktifkan caching untuk dependencies
+          # Hapus cache gradle karena tidak digunakan
+          cache: "none"
 
-      # Setup Android SDK
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          sdk-version: "34.0.0"
-          build-tools-version: "34.0.0"
-          ndk-version: "25.2.9519653"
-          cmake-version: "3.22.1"
-          
-      # Konfigurasi environment Android
-      - name: Configure Android Paths
-        run: |
-          echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> $GITHUB_PATH
-          echo "$ANDROID_SDK_ROOT/platform-tools" >> $GITHUB_PATH
-          echo "$ANDROID_SDK_ROOT/build-tools/34.0.0" >> $GITHUB_PATH
-
-      # Install Node.js (diperlukan untuk Bubblewrap)
+      # Setup Node.js (untuk Bubblewrap)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -52,24 +35,27 @@ jobs:
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
-      # Inisialisasi project TWA dengan penanganan prompt otomatis
+      # Inisialisasi project TWA
       - name: Initialize TWA Project
         run: |
-          printf "y\ny\n" | bubblewrap init \
+          # Skip instalasi JDK dan Android SDK karena sudah disetup oleh GitHub Actions
+          export BUBBLEWRAP_DISABLE_SDK_INSTALLATION=true
+          yes | bubblewrap init \
             --manifest=https://data-keuangan-aziva.web.app/manifest.json \
             --directory=twa-project \
             --force \
             --usePlaySigning=false \
             --skipPrompt \
             --packageId=com.aziva.keuangan
-        env:
-          # Menggunakan SDK yang sudah diinstall
-          BUBBLEWRAP_DISABLE_SDK_INSTALLATION: "true"
 
       # Build APK
       - name: Build APK
         working-directory: twa-project
         run: |
+          # Set environment variables untuk build Android
+          export ANDROID_HOME=$ANDROID_SDK_ROOT
+          export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
+          
           bubblewrap build \
             --skipVersionCheck \
             --skipPwaValidation
@@ -80,11 +66,4 @@ jobs:
         with:
           name: twa-apk
           path: twa-project/app-release-signed.apk
-          retention-days: 7  # Menyimpan artifact selama 7 hari
-
-      # Opsional: Upload ke GitHub Releases
-      # - name: Upload to Release
-      #   uses: softprops/action-gh-release@v1
-      #   if: startsWith(github.ref, 'refs/tags/')
-      #   with:
-      #     files: twa-project/app-release-signed.apk
+          retention-days: 7
