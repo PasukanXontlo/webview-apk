@@ -13,12 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -27,18 +21,39 @@ jobs:
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
+      - name: Prepare TWA manifest
+        run: |
+          mkdir twa-project
+          cat > twa-project/twa-manifest.json <<EOF
+{
+  "name": "Aziva",
+  "short_name": "Aziva",
+  "start_url": "https://data-keuangan-aziva.web.app/",
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "https://data-keuangan-aziva.web.app/",
+  "host": "data-keuangan-aziva.web.app",
+  "launcherName": "Aziva",
+  "generatorApp": "bubblewrap-cli",
+  "fallbackType": "customtabs",
+  "signingKey": {
+    "path": "my-release-key.jks",
+    "alias": "my-key-alias"
+  }
+}
+EOF
+
       - name: Init TWA project
         run: |
-          yes "n" | npx bubblewrap init \
-            --manifest=https://data-keuangan-aziva.web.app/manifest.json \
-            --directory=twa-project \
-            --force \
-            --usePlaySigning=false
+          cd twa-project
+          bubblewrap init --manifest twa-manifest.json --force --usePlaySigning=false
 
       - name: Build APK
         run: |
           cd twa-project
-          npx bubblewrap build
+          bubblewrap build
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
