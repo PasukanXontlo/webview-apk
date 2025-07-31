@@ -13,25 +13,27 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      # Menginstal Java Development Kit (JDK)
+      # Setup Java 17 (diperlukan oleh Bubblewrap)
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: "temurin"
           java-version: "17"
 
-      # Menginstal Android SDK (termasuk build-tools)
+      # Setup Android SDK
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
           sdk-version: 34.0.0
-          
+
+      # Install Bubblewrap CLI
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
-      - name: Install Bubblewrap & Initialize TWA
+      # Init TWA Project dengan jawaban "n" otomatis
+      - name: Init TWA project
         run: |
-          yes | npx bubblewrap init \
+          echo "n" | npx bubblewrap init \
             --manifest=https://data-keuangan-aziva.web.app/manifest.json \
             --directory=twa-project \
             --force \
@@ -39,16 +41,14 @@ jobs:
             --skipPrompt \
             --packageId=com.aziva.keuangan
 
+      # Build APK dari TWA project
       - name: Build APK
         working-directory: twa-project
         run: bubblewrap build
 
+      # Upload hasil APK ke GitHub Artifacts
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: twa-apk
           path: twa-project/app-release-signed.apk
-          
-          
-          
-          
